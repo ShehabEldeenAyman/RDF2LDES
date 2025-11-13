@@ -1,0 +1,22 @@
+Output Format: N-triples
+
+PS C:\Code exercises\RDF2LDES-New> python LDES_YMD.py
+Processing completed in 665.77 seconds.
+PS C:\Code exercises\RDF2LDES-New> python LDES_YMD_rdflib.py
+Processing completed in 712.74 seconds.
+PS C:\Code exercises\RDF2LDES> python RDF2LDES_YMD_SPARQL.py
+Processing completed in 557.62 seconds.
+PS C:\Code exercises\RDF2LDES> python RDF2LDES_YMD_ALG_DAY.py
+Processing completed in 115.52 seconds.
+PS C:\Code exercises\RDF2LDES> python RDF2LDES_YMD_ALG_MONTH.py
+Processing completed in 108.00 seconds.
+PS C:\Code exercises\RDF2LDES> python RDF2LDES_YMD_ALG_DAY_V2.py
+Processing completed in 94.40 seconds.
+PS C:\Code exercises\RDF2LDES> python RDF2LDES_YMD_ALG_MONTH_V2.py
+Processing completed in 99.06 seconds.
+##################################################################
+
+Output Format: Turtle
+
+PS C:\Code exercises\RDF2LDES> python RDF2LDES_YMD_ALG_DAY_V2_TURTLE.py
+Processing completed in 125.87 seconds.

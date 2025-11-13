@@ -10,7 +10,7 @@ import calendar
 import time
 
 
-input_path = "Mol_Sluis_Dessel_data_prettified.ttl"
+input_path = "./sources/Mol_Sluis_Dessel_data_prettified.ttl"
 base_path = "./data" 
 
 def load_graph(input_path):
