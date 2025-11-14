@@ -1,0 +1,78 @@
+@prefix as: <https://www.w3.org/ns/activitystreams#> .
+@prefix ldes: <https://w3id.org/ldes#> .
+@prefix tree: <https://w3id.org/tree#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+_:N24631b0487884b3880a2ff7d1f8d0137 {
+    <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/> a ldes:EventStream ;
+        ldes:retentionPolicy _:N2cb8437187004d599947c0a354caa318 ;
+        ldes:timestampPath as:published ;
+        ldes:versionCreateObject as:Create ;
+        ldes:versionDeleteObject as:Delete ;
+        ldes:versionOfPath as:object ;
+        tree:view <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/> .
+
+    _:N0059b664a077437182f4d988bdd470d6 a tree:GreaterThanOrEqualToRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2024/> ;
+        tree:path as:published ;
+        tree:value "2024"^^xsd:gYear .
+
+    _:N06c59c95c122454e824385129292bea7 a tree:LessThanRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2020/> ;
+        tree:path as:published ;
+        tree:value "2021"^^xsd:gYear .
+
+    _:N1739c7ba2b44430dbfbda092e9f24a5d a tree:LessThanRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2021/> ;
+        tree:path as:published ;
+        tree:value "2022"^^xsd:gYear .
+
+    _:N25559ef916f04317a556cb416b630251 a tree:GreaterThanOrEqualToRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2020/> ;
+        tree:path as:published ;
+        tree:value "2020"^^xsd:gYear .
+
+    _:N2793ad3281d647b3a1debd389c041798 a tree:LessThanRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2025/> ;
+        tree:path as:published ;
+        tree:value "2026"^^xsd:gYear .
+
+    _:N3695a152029646238bb5b168147c1a58 a tree:GreaterThanOrEqualToRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2023/> ;
+        tree:path as:published ;
+        tree:value "2023"^^xsd:gYear .
+
+    _:N7126f7ab21cb42c0b73ccfbbedbc99a1 a tree:LessThanRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2024/> ;
+        tree:path as:published ;
+        tree:value "2025"^^xsd:gYear .
+
+    _:Na1c6476d83f24c14aa3ac3f57fbf88ac a tree:GreaterThanOrEqualToRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2021/> ;
+        tree:path as:published ;
+        tree:value "2021"^^xsd:gYear .
+
+    _:Nd9fb6adba1b343dc8e10cc64481e0795 a tree:LessThanRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2023/> ;
+        tree:path as:published ;
+        tree:value "2024"^^xsd:gYear .
+
+    _:Nf0e79b79b98e4693a1a39cc2c9b023f2 a tree:GreaterThanOrEqualToRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2025/> ;
+        tree:path as:published ;
+        tree:value "2025"^^xsd:gYear .
+
+    _:Nf24cbb84673e4aee83110c84b6d229a8 a tree:GreaterThanOrEqualToRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2022/> ;
+        tree:path as:published ;
+        tree:value "2022"^^xsd:gYear .
+
+    _:Nfbd4f8fef7d94041bb887f5350dc9dc4 a tree:LessThanRelation ;
+        tree:node <https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/2022/> ;
+        tree:path as:published ;
+        tree:value "2023"^^xsd:gYear .
+
+    _:N2cb8437187004d599947c0a354caa318 a ldes:LatestVersionSubset ;
+        ldes:amount 1 .
+}
+
