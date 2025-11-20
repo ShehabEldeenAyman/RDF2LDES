@@ -1,3 +1,4 @@
 # Ignore Turtle and N-Triples RDF files
 *.ttl
 *.nt
+*.trig
