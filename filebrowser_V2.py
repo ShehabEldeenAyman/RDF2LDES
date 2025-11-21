@@ -3,7 +3,7 @@ from pathlib import Path
 from rdflib import Graph, Namespace, Literal, URIRef, BNode
 from rdflib.namespace import XSD, RDF
 import time
-from datetime import date, timedelta
+from datetime import date, timedelta,timezone,datetime
 
 
 directory = "data/"
@@ -24,14 +24,21 @@ def create_ldes_files():
         
         #print("Current folder:", root)
         write_log(f"Current folder: {root} \n")
+        write_log(f"Current folder length: {len(Path(root).parts)} \n")
         path = Path(root)
         #print("Last Folder", path.parts[-1]) #File name maybe
-        write_log(f"Last Folder {path.parts[-1]} \n")
+        write_log(f"Last part of directory {path.parts[-1]} \n")
         #print("Subfolders:", dirs)
         #print("Subfolders:\n " + "\n ".join(dirs))
         # with open(os.path.join(root,f"{path.parts[-1]}.ttl"),'w') as file:
         #     pass
         temp_graph = create_base_graph()
+        direct_subfolders = [Path(root) / d for d in dirs]
+        for folder in direct_subfolders:
+            write_log(f"  Subfolder: {folder.as_posix()}\n")
+            #print(len(Path(folder).parts),"\n")
+
+
         
         
         for d in dirs:
@@ -40,23 +47,35 @@ def create_ldes_files():
             bn_ge = BNode()
             bn_lt = BNode()
             temp_graph.add((bn_ge, RDF.type, TREE.GreaterThanOrEqualToRelation))
-            temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}")))
+            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 3:
+                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}")))
+            else:
+                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
             temp_graph.add((bn_ge, TREE.path, AS.published))
+
+            if(len(Path(direct_subfolders).parts)==2):
+                print(Path(direct_subfolders).parts[1]) #we should find a way to get the subfolders
+                #temp_graph.add((bn_ge, TREE.value, Literal(timestamp, datatype=XSD.dateTime)))
             #still missing the date time value here
 
             temp_graph.add((bn_lt, RDF.type, TREE.LessThanRelation))
-            temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}")))
+            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 3:
+                temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}")))
+            else:
+                temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
             temp_graph.add((bn_lt, TREE.path, AS.published))
+
             #still missing the date time value here
 
             
                 #this is where we add actual metadata about the subfolder
                 #file.write(f"{d}\n")
-        
-        with open(os.path.join(root,f"{path.parts[-1]}.ttl"),'a') as file: # we should move the with open with file write to after the for loop. the for loop will only creat the greater than less than relations. It will add them to the base graph initialized before the loop, then it will be added to the graph and written after the graph.
-                #print(f" Writing to file: {os.path.join(root,f'{path.parts[-1]}.ttl')}")
-                write_log(f" Writing to file: {Path(os.path.join(root,f'{path.parts[-1]}.ttl')).as_posix()} \n")
-                file.write(temp_graph.serialize(format="trig"))
+        if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 4:
+            with open(os.path.join(root,f"{path.parts[-1]}.ttl"),'a') as file: # we should move the with open with file write to after the for loop. the for loop will only creat the greater than less than relations. It will add them to the base graph initialized before the loop, then it will be added to the graph and written after the graph.
+                    #print(f" Writing to file: {os.path.join(root,f'{path.parts[-1]}.ttl')}")
+                    write_log(f"path parts: {len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts)} \n")
+                    write_log(f" Writing to file: {Path(os.path.join(root,f'{path.parts[-1]}.ttl')).as_posix()} \n")
+                    file.write(temp_graph.serialize(format="trig"))
 
         #print("Files:", files)
         write_log("-" * 40)
