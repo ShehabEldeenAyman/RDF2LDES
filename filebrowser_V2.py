@@ -22,20 +22,23 @@ def create_ldes_files():
     for root, dirs, files in os.walk(directory):
         print("Current folder:", root)
         path = Path(root)
-        print("Folder parts:", path.parts[-1]) #File name maybe
+        print("Last Folder", path.parts[-1]) #File name maybe
         #print("Subfolders:", dirs)
         #print("Subfolders:\n " + "\n ".join(dirs))
         # with open(os.path.join(root,f"{path.parts[-1]}.ttl"),'w') as file:
         #     pass
-        with open(os.path.join(root,f"{path.parts[-1]}.ttl"),'a') as file: # we should move the with open with file write to after the for loop. the for loop will only creat the greater than less than relations. It will add them to the base graph initialized before the loop, then it will be added to the graph and written after the graph.
-                print(f" Writing to file: {os.path.join(root,f'{path.parts[-1]}.ttl')}")
-                file.write(create_base_graph().serialize(format="trig"))
+        temp_graph = create_base_graph()
+        
+        
         for d in dirs:
             print(" Subfolder:", d)
             
                 #this is where we add actual metadata about the subfolder
                 #file.write(f"{d}\n")
-                
+        
+        with open(os.path.join(root,f"{path.parts[-1]}.ttl"),'a') as file: # we should move the with open with file write to after the for loop. the for loop will only creat the greater than less than relations. It will add them to the base graph initialized before the loop, then it will be added to the graph and written after the graph.
+                print(f" Writing to file: {os.path.join(root,f'{path.parts[-1]}.ttl')}")
+                file.write(temp_graph.serialize(format="trig"))
 
         #print("Files:", files)
         print("-" * 40)
