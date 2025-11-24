@@ -38,8 +38,14 @@ def create_ldes_files():
             write_log(f"  Subfolder: {folder.as_posix()}\n")
             #print(len(Path(folder).parts),"\n")
 
-
-        
+        # for sub in direct_subfolders:
+        #         p = Path(sub)
+        #         if len(p.parts) == 2:
+        #             print(p.parts[1])
+        #         if len(p.parts) == 3:
+        #             print(p.parts[2])
+        #         if len(p.parts) == 4:
+        #             print(p.parts[3])
         
         for d in dirs:
             #print(" Subfolder:", d)
@@ -53,8 +59,23 @@ def create_ldes_files():
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
             temp_graph.add((bn_ge, TREE.path, AS.published))
 
-            if(len(Path(direct_subfolders).parts)==2):
-                print(Path(direct_subfolders).parts[1]) #we should find a way to get the subfolders
+            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 3:
+                #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) #writing in each year file. so we should be refrencing months.
+                #print(d) #this is the actual month.
+                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime))) #this has a small bug that needs to be fixed
+
+            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 2: #writing in the main data file. it should be ok
+                #print(d)
+                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(d),1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(d)+1,1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+
+            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 4:
+                print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) #writing in the month file. so we should be refrencing days.
+                #print(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2])
+                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+            # if(len(Path(direct_subfolders).parts)==2):
+            #     print(Path(direct_subfolders).parts[1]) #we should find a way to get the subfolders
                 #temp_graph.add((bn_ge, TREE.value, Literal(timestamp, datatype=XSD.dateTime)))
             #still missing the date time value here
 
