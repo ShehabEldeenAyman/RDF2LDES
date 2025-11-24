@@ -59,8 +59,8 @@ def create_ldes_files():
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
             temp_graph.add((bn_ge, TREE.path, AS.published))
 
-            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 3:
-                #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) #writing in each year file. so we should be refrencing months.
+            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 3:#writing in each year file. so we should be refrencing months.
+                #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) 
                 #print(d) #this is the actual month.
                 temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
                 temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime))) #this has a small bug that needs to be fixed
@@ -70,10 +70,12 @@ def create_ldes_files():
                 temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(d),1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
                 temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(d)+1,1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
 
-            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 4:
-                print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) #writing in the month file. so we should be refrencing days.
+            if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 4:#writing in the month file. so we should be refrencing days.
+                #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) 
                 #print(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2])
-                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),int(d),0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),int(d),0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+
             # if(len(Path(direct_subfolders).parts)==2):
             #     print(Path(direct_subfolders).parts[1]) #we should find a way to get the subfolders
                 #temp_graph.add((bn_ge, TREE.value, Literal(timestamp, datatype=XSD.dateTime)))
