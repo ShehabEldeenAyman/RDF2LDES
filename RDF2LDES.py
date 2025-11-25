@@ -1,4 +1,4 @@
-from rdflib import Graph, Namespace, Literal, URIRef, BNode
+from rdflib import Graph, Namespace, Literal, URIRef, BNode,ConjunctiveGraph
 from rdflib.namespace import XSD, RDF
 from collections import defaultdict
 from datetime import date, timedelta,timezone,datetime
@@ -93,6 +93,7 @@ def divide_data(observations):
         temp_graph.bind("sosa", SOSA)
         temp_graph.bind("ex", EX)
         temp_graph.bind("xsd", XSD)
+        store = ConjunctiveGraph()
 
         for obs, id_, result_value, property_, time_ in daily_obs:
             temp_graph.add((obs, RDF.type, SOSA.Observation))
@@ -101,7 +102,9 @@ def divide_data(observations):
             temp_graph.add((obs, SOSA.observedProperty, Literal(property_)))
             temp_graph.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
 
-        temp_graph.serialize(destination=file_path, format="turtle")
+
+        temp_graph.serialize(destination=file_path, format="trig")
+        #temp_graph.serialize(destination=file_path, format="turtle")
         # with open(file_path, "w", encoding="utf-8") as f:
         #     f.write(temp_graph.serialize(format="nt"))
 
