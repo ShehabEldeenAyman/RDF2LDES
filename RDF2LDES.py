@@ -150,11 +150,15 @@ def create_ldes_files():
             bn_ge = BNode()
             bn_lt = BNode()
             temp_graph.add((bn_ge, RDF.type, TREE.GreaterThanOrEqualToRelation))
-            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) == 2: #this is the main data.ttl file
-                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}/{d}.ttl")))
+            # if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) == 2:
+            #     print(os.path.join(root, f"{path.parts[-1]}.ttl"))
                 #print(URIRef(f"{eventstream_uri}{root}/{d}/{d}.ttl"))
-            else:
+            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 3: #this is the main data.ttl file
+                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}/{d}.ttl")))
+                #
+            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) > 3:
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}/readings.ttl")))
+
             temp_graph.add((bn_ge, TREE.path, AS.published))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 3:#writing in each year file. so we should be refrencing months.
@@ -180,7 +184,7 @@ def create_ldes_files():
             #still missing the date time value here
 
             temp_graph.add((bn_lt, RDF.type, TREE.LessThanRelation))
-            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) == 3:
+            if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 3:
                 temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}/{d}.ttl")))
                 #print(URIRef(f"{eventstream_uri}{root}/{d}/{d}.ttl"))
             if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) > 3:
