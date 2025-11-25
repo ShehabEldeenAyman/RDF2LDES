@@ -20,7 +20,7 @@ AS = Namespace("https://www.w3.org/ns/activitystreams#")
 LDES = Namespace("https://w3id.org/ldes#")
 TREE = Namespace("https://w3id.org/tree#")
 eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/")
-view_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/ldes/")
+view_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/data/data.ttl")
 
 
 #RDF2LDES##############################################################################################
