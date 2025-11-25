@@ -146,6 +146,8 @@ def create_ldes_files():
         
         for d in dirs:
             #print(" Subfolder:", d)
+            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{eventstream_uri}{root}")))
+            
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()
             bn_lt = BNode()
@@ -225,7 +227,7 @@ def create_base_graph():
     g.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
     g.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
     g.add((eventstream_uri, LDES.versionOfPath, AS.object))
-    g.add((eventstream_uri, TREE.view, view_uri)) # this needs to be moved and properly fixed
+    #g.add((eventstream_uri, TREE.view, view_uri)) # this needs to be moved and properly fixed
 
     g.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
     g.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
