@@ -151,9 +151,10 @@ def create_ldes_files():
             bn_lt = BNode()
             temp_graph.add((bn_ge, RDF.type, TREE.GreaterThanOrEqualToRelation))
             if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 3:
-                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}")))
+                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}.ttl")))
+                #print(URIRef(f"{eventstream_uri}{root}/{d}.ttl"))
             else:
-                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
+                temp_graph.add((bn_ge, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}/readings.ttl")))
             temp_graph.add((bn_ge, TREE.path, AS.published))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 3:#writing in each year file. so we should be refrencing months.
@@ -180,7 +181,7 @@ def create_ldes_files():
 
             temp_graph.add((bn_lt, RDF.type, TREE.LessThanRelation))
             if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) <= 3:
-                temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}")))
+                temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}.ttl")))
             else:
                 #temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
                 temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}/readings.ttl")))
