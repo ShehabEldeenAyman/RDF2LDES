@@ -93,7 +93,7 @@ def divide_data(observations):
         temp_graph.bind("sosa", SOSA)
         temp_graph.bind("ex", EX)
         temp_graph.bind("xsd", XSD)
-        store = ConjunctiveGraph()
+        #store = ConjunctiveGraph()
 
         for obs, id_, result_value, property_, time_ in daily_obs:
             temp_graph.add((obs, RDF.type, SOSA.Observation))
