@@ -54,7 +54,7 @@ def divide_data(result):
 
     # Process one file per day
     for (year, month, day), observations in grouped.items():
-        file_path = os.path.join(base_path, f"{year}/{month:02d}/{day:02d}/readings.nt")
+        file_path = os.path.join(base_path, f"{year}/{month:02d}/{day:02d}/readings.ttl")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         temp_graph = Graph()
@@ -70,8 +70,9 @@ def divide_data(result):
             temp_graph.add((obs, SOSA.resultTime, Literal(time_.toPython(), datatype=XSD.dateTime)))
 
         # Serialize all observations for that day at once
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(temp_graph.serialize(format='nt'))
+        # with open(file_path, "w", encoding="utf-8") as f:  #change to rdflib serialize
+        #     f.write(temp_graph.serialize(format='nt'))
+        temp_graph.serialize(destination=file_path, format='trig')
 
 
 def main():
