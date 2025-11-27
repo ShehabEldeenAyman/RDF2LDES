@@ -44,63 +44,60 @@ WHERE {
     print(f"Total snippets processed: {len(result)}")
     return result
 
-# def divide_data(result):
+
+def divide_data(result):
     SOSA = Namespace("http://www.w3.org/ns/sosa/")
     example = Namespace("http://example.org/")
     xsd = Namespace("http://www.w3.org/2001/XMLSchema#")
     tss = Namespace("https://w3id.org/tss#")
 
-    os.makedirs(base_path, exist_ok=True)
+    grouped = defaultdict(list)
 
+    # grouping (fast, no datetime parsing)
     for row in result:
-        # Extract variables from SPARQL row
-        snippet = row['snippet']
-        from_time = row['fromTime']
-        to_time = row['toTime']
-        pointType = row['pointType']
-        pointsJson = row['pointsJson']
-        template = row['template']
-        sensor = row['sensor']
-        observedProperty = row['observedProperty']
+        dt = str(row['fromTime'])
+        key = (dt[:4], dt[5:7], dt[8:10])  # year, month, day
+        grouped[key].append(row)
 
-        # Extract year, month, day from ?from variable
-        dt = datetime.fromisoformat(str(from_time.toPython()))
-        year_str = str(dt.year)
-        month_str = f"{dt.month:02d}"
-        day_str = f"{dt.day:02d}"
+    template_cache = set()
 
-        # Output path
-        file_path = os.path.join(base_path, year_str, month_str, day_str, "readings.ttl")
+    for (year, month, day), rows in grouped.items():
+        g = Graph()
+        g.bind("sosa", SOSA)
+        g.bind("ex", example)
+        g.bind("xsd", xsd)
+        g.bind("tss", tss)
+
+        for row in rows:
+            snippet = row['snippet']
+            from_time = str(row['fromTime'])
+            to_time = str(row['toTime'])
+            pointType = row['pointType']
+            pointsJson = row['pointsJson']
+            template = row['template']
+            sensor = row['sensor']
+            observedProperty = row['observedProperty']
+
+            # snippet triples
+            g.add((snippet, RDF.type, tss.Snippet))
+            g.add((snippet, tss.about, template))
+            g.add((snippet, tss.from_, Literal(from_time, datatype=xsd.dateTime)))
+            g.add((snippet, tss.to, Literal(to_time, datatype=xsd.dateTime)))
+            g.add((snippet, tss.pointType, Literal(pointType)))
+            g.add((snippet, tss.points, Literal(pointsJson)))
+
+            # template (only once)
+            if template not in template_cache:
+                template_cache.add(template)
+                g.add((template, RDF.type, tss.PointTemplate))
+                g.add((template, SOSA.madeBySensor, sensor))
+                g.add((template, SOSA.observedProperty, observedProperty))
+
+        # output
+        file_path = os.path.join(base_path, year, month, day, "readings.ttl")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        g.serialize(destination=file_path, format="turtle")
 
-        # Create small graph for writing
-        temp_graph = Graph()
-        temp_graph.bind("sosa", SOSA)
-        temp_graph.bind("ex", example)
-        temp_graph.bind("xsd", xsd)
-        temp_graph.bind("tss", tss)
-
-        # Add triples (example model - adjust as needed)
-        temp_graph.add((snippet, RDF.type, tss.Snippet))
-        temp_graph.add((snippet, tss.about, template))
-        temp_graph.add((snippet, tss.from_, Literal(from_time.toPython(), datatype=xsd.dateTime)))
-        temp_graph.add((snippet, tss.to, Literal(to_time.toPython(), datatype=xsd.dateTime)))
-        temp_graph.add((snippet, tss.pointType, Literal(pointType)))
-        temp_graph.add((snippet, tss.points, Literal(pointsJson)))
-
-        temp_graph.add((template, RDF.type, tss.PointTemplate))
-        temp_graph.add((template, SOSA.madeBySensor, sensor))
-        temp_graph.add((template, SOSA.observedProperty, observedProperty))
-
-        # Serialize
-        ttl_str = temp_graph.serialize(format='turtle')
-
-        # Append to file
-        with open(file_path, "a", encoding="utf-8") as f:
-            f.write(ttl_str)
-            f.write("\n")
-
-def divide_data(result):
     SOSA = Namespace("http://www.w3.org/ns/sosa/")
     example = Namespace("http://example.org/")
     xsd = Namespace("http://www.w3.org/2001/XMLSchema#")
