@@ -8,19 +8,19 @@ from pathlib import Path
 
 # --- Config ---
 input_path = "./sources/Mol_Sluis_Dessel_data_prettified.ttl"
-base_path = "./data"
+base_path = "./LDES"
 
 # --- Namespaces ---
 SOSA = Namespace("http://www.w3.org/ns/sosa/")
-EX = Namespace("http://example.com/")
+EX = Namespace("http://example.org/")
 XSD = Namespace("http://www.w3.org/2001/XMLSchema#")
 
-directory = "data/"
+directory = "LDES/"
 AS = Namespace("https://www.w3.org/ns/activitystreams#")
 LDES = Namespace("https://w3id.org/ldes#")
 TREE = Namespace("https://w3id.org/tree#")
 eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/")
-view_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/data/data.ttl")
+#view_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/data/data.ttl")
 
 
 #RDF2LDES##############################################################################################
@@ -28,7 +28,7 @@ view_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/
 def load_graph(input_path):
     """Load the RDF graph from a Turtle file."""
     g = Graph()
-    g.parse(input_path, format="turtle", publicID="https://example.com/")
+    g.parse(input_path, format="turtle", publicID="https://example.org/")
     return g
 
 
