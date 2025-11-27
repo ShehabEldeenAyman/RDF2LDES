@@ -15,7 +15,7 @@ base_path = "./data"
 
 def load_graph(input_path):
     g = Graph()
-    g.parse(input_path, format="turtle", publicID="https://example.com/")
+    g.parse(input_path, format="turtle", publicID="https://example.org/")
     return g
 
 def process_graph(graph):
@@ -44,9 +44,9 @@ WHERE {
     print(f"Total snippets processed: {len(result)}")
     return result
 
-def divide_data(result):
+# def divide_data(result):
     SOSA = Namespace("http://www.w3.org/ns/sosa/")
-    example = Namespace("http://example.com/")
+    example = Namespace("http://example.org/")
     xsd = Namespace("http://www.w3.org/2001/XMLSchema#")
     tss = Namespace("https://w3id.org/tss#")
 
@@ -100,6 +100,59 @@ def divide_data(result):
             f.write(ttl_str)
             f.write("\n")
 
+def divide_data(result):
+    SOSA = Namespace("http://www.w3.org/ns/sosa/")
+    example = Namespace("http://example.org/")
+    xsd = Namespace("http://www.w3.org/2001/XMLSchema#")
+    tss = Namespace("https://w3id.org/tss#")
+
+    grouped = defaultdict(list)
+
+    # First pass: group rows by date
+    for row in result:
+        dt = datetime.fromisoformat(str(row['fromTime'].toPython()))
+        key = (dt.year, dt.month, dt.day)
+        grouped[key].append(row)
+
+    # Second pass: write one graph per date
+    for (year, month, day), rows in grouped.items():
+        g = Graph()
+        g.bind("sosa", SOSA)
+        g.bind("ex", example)
+        g.bind("xsd", xsd)
+        g.bind("tss", tss)
+
+        for row in rows:
+            snippet = row['snippet']
+            from_time = row['fromTime']
+            to_time = row['toTime']
+            pointType = row['pointType']
+            pointsJson = row['pointsJson']
+            template = row['template']
+            sensor = row['sensor']
+            observedProperty = row['observedProperty']
+
+            g.add((snippet, RDF.type, tss.Snippet))
+            g.add((snippet, tss.about, template))
+            g.add((snippet, tss.from_, Literal(from_time.toPython(), datatype=xsd.dateTime)))
+            g.add((snippet, tss.to, Literal(to_time.toPython(), datatype=xsd.dateTime)))
+            g.add((snippet, tss.pointType, Literal(pointType)))
+            g.add((snippet, tss.points, Literal(pointsJson)))
+
+            g.add((template, RDF.type, tss.PointTemplate))
+            g.add((template, SOSA.madeBySensor, sensor))
+            g.add((template, SOSA.observedProperty, observedProperty))
+
+        # Output path
+        year_str = f"{year:04d}"
+        month_str = f"{month:02d}"
+        day_str = f"{day:02d}"
+
+        file_path = os.path.join(base_path, year_str, month_str, day_str, "readings.ttl")
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        # Write once → prefixes appear only once
+        g.serialize(destination=file_path, format="turtle")
 
         
 def main():
