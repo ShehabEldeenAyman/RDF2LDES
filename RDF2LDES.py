@@ -146,7 +146,7 @@ def create_ldes_files():
         
         for d in dirs:
             #print(" Subfolder:", d)
-            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{eventstream_uri}{root}")))
+            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{eventstream_uri}{root}/{path.parts[-1]}.ttl")))
             
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()

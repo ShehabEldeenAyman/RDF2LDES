@@ -335,8 +335,8 @@ def create_ldes_files():
         #             print(p.parts[3])
         
         for d in dirs:
-            #print(" Subfolder:", d)
-            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{eventstream_uri}{root}")))
+            #print(" Subfolder:", d)                                                        #we only need last part of root.
+            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{eventstream_uri}{root}/{path.parts[-1]}.ttl"))) #this needs to be fixed first thing in the morning.
             
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()
