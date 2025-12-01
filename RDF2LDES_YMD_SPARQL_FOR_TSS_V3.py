@@ -84,6 +84,7 @@ def divide_data(result):
 
         metadata_graph.add((retention_policy, RDF.type, LDES.LatestVersionSubset))
         metadata_graph.add((retention_policy, LDES.amount, Literal(1, datatype=XSD.integer)))
+        metadata_graph.add((base_uri, TREE.view, URIRef(f"{base_uri}{year:04d}/{month:02d}/{day:02d}/readings.trig")))
 
 
         for row in rows:
@@ -117,6 +118,10 @@ def divide_data(result):
             # Add TSS member to metadat graph
             # -----------------------------
             metadata_graph.add((base_uri,TREE.member,snippet_iri))
+            metadata_graph.add((snippet_iri,RDF.type, AS.Create))
+            metadata_graph.add((snippet_iri, AS.object, snippet_iri))
+            metadata_graph.add((snippet_iri, AS.published, Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
+
 
 
         # output path
