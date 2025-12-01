@@ -142,7 +142,7 @@ AS = Namespace("https://www.w3.org/ns/activitystreams#")
 LDES = Namespace("https://w3id.org/ldes#")
 TREE = Namespace("https://w3id.org/tree#")
 eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDESTSS/LDESTSS.trig") #change this everytime you change the base uri for hosting
-base_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/data/LDES/")
+base_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/")
 
 def delete_ldes_files():
     for root, dirs, files in os.walk(directory):
@@ -170,8 +170,8 @@ def create_ldes_files():
             #print(len(Path(folder).parts),"\n")
        
         for d in dirs:
-            #print(" Subfolder:", d)                                                        #we only need last part of root.
-            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{eventstream_uri}/{path.parts[-1]}.trig"))) #this needs to be fixed first thing in the morning.
+            #print(" Subfolder:", d)                                                       
+            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{base_uri}{root}/{path.parts[-1]}.trig"))) 
             
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()
@@ -182,9 +182,7 @@ def create_ldes_files():
 
             #######
             temp_graph.add((bn_ge, RDF.type, TREE.GreaterThanOrEqualToRelation))
-            # if len(Path(os.path.join(root, f"{path.parts[-1]}.ttl")).parts) == 2:
-            #     print(os.path.join(root, f"{path.parts[-1]}.ttl"))
-                #print(URIRef(f"{eventstream_uri}{root}/{d}/{d}.ttl"))
+
             if len(Path(os.path.join(root, f"{path.parts[-1]}.trig")).parts) <= 3: #this is the main data.ttl file
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{base_uri}{root}/{d}/{d}.trig")))
                 #
