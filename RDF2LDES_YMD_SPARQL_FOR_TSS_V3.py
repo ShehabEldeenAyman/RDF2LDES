@@ -13,13 +13,7 @@ from pathlib import Path
 
 
 input_path = "./sources/Mol_Sluis_Dessel_data_TSS_per_day.ttl"
-base_path = "./LDESTSS" 
-_bnode_counter = 0
-def short_bnode_id(node):
-    global _bnode_counter
-    if isinstance(node, BNode):
-        return f"b{_bnode_counter}"
-    return None
+base_path = "./LDESTSS"
 
 def load_graph(input_path):
     g = Graph()
@@ -27,7 +21,7 @@ def load_graph(input_path):
     return g
 
 def process_graph(graph):
-    process_graph_query = """
+    query = """
 PREFIX tss: <https://w3id.org/tss#>
 PREFIX sosa: <http://www.w3.org/ns/sosa/>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -46,119 +40,79 @@ WHERE {
               sosa:madeBySensor ?sensor ;
               sosa:observedProperty ?observedProperty .
 }
-
 """
-    result = graph.query(process_graph_query)
+    result = graph.query(query)
     print(f"Total snippets processed: {len(result)}")
     return result
 
 
 def divide_data(result):
     SOSA = Namespace("http://www.w3.org/ns/sosa/")
-    example = Namespace("http://example.org/")
-    xsd = Namespace("http://www.w3.org/2001/XMLSchema#")
-    tss = Namespace("https://w3id.org/tss#")
+    EX = Namespace("http://example.org/")
+    TSS = Namespace("https://w3id.org/tss#")
 
     grouped = defaultdict(list)
 
-    # grouping (fast, no datetime parsing)
-    for row in result:
-        dt = str(row['fromTime'])
-        key = (dt[:4], dt[5:7], dt[8:10])  # year, month, day
-        grouped[key].append(row)
-
-    template_cache = set()
-
-    for (year, month, day), rows in grouped.items():
-        #g = Graph() #change################################
-        g = Graph()# not Graph() probably dataset
-        meta_graph = Graph()    
-        meta_graph.add((base_uri,RDF.type, LDES.EventStream))
-
-        g.bind("sosa", SOSA)
-        g.bind("ex", example)
-        g.bind("xsd", xsd)
-        g.bind("tss", tss)
-        for row in rows:
-            snippet = row['snippet']
-            from_time = str(row['fromTime'])
-            to_time = str(row['toTime'])
-            pointType = row['pointType']
-            pointsJson = row['pointsJson']
-            template = row['template']
-            sensor = row['sensor']
-            observedProperty = row['observedProperty']
-
-            # snippet triples
-            g.add((snippet, RDF.type, tss.Snippet))
-            g.add((snippet, tss.about, template))
-            g.add((snippet, tss.from_, Literal(from_time, datatype=xsd.dateTime)))
-            g.add((snippet, tss.to, Literal(to_time, datatype=xsd.dateTime)))
-            g.add((snippet, tss.pointType, Literal(pointType)))
-            g.add((snippet, tss.points, Literal(pointsJson)))
-
-            # template (only once)
-            if template not in template_cache:
-                template_cache.add(template)
-                g.add((template, RDF.type, tss.PointTemplate))
-                g.add((template, SOSA.madeBySensor, sensor))
-                g.add((template, SOSA.observedProperty, observedProperty))
-
-        # output
-        file_path = os.path.join(base_path, year, month, day, "readings.trig")
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        g.serialize(destination=file_path, format="trig")
-
-    SOSA = Namespace("http://www.w3.org/ns/sosa/")
-    example = Namespace("http://example.org/")
-    xsd = Namespace("http://www.w3.org/2001/XMLSchema#")
-    tss = Namespace("https://w3id.org/tss#")
-
-    grouped = defaultdict(list)
-
-    # First pass: group rows by date
+    # group by date
     for row in result:
         dt = datetime.fromisoformat(str(row['fromTime'].toPython()))
         key = (dt.year, dt.month, dt.day)
         grouped[key].append(row)
 
-    # Second pass: write one graph per date
+    # process one dataset per day
     for (year, month, day), rows in grouped.items():
-        g = Dataset()     # not Graph()
-        g.bind("sosa", SOSA)
-        g.bind("ex", example)
-        g.bind("xsd", xsd)
-        g.bind("tss", tss)
+
+        ds = Dataset()
+        ds.bind("sosa", SOSA)
+        ds.bind("ex", EX)
+        ds.bind("tss", TSS)
+        ds.bind("xsd", XSD)
+        metadata_graph = ds.graph(base_uri)
+
+        metadata_graph.add((base_uri, RDF.type, LDES.EventStream))
+
         for row in rows:
-            snippet = row['snippet']
-            from_time = row['fromTime']
-            to_time = row['toTime']
-            pointType = row['pointType']
-            pointsJson = row['pointsJson']
-            template = row['template']
-            sensor = row['sensor']
-            observedProperty = row['observedProperty']
 
-            g.add((snippet, RDF.type, tss.Snippet))
-            g.add((snippet, tss.about, template))
-            g.add((snippet, tss.from_, Literal(from_time.toPython(), datatype=xsd.dateTime)))
-            g.add((snippet, tss.to, Literal(to_time.toPython(), datatype=xsd.dateTime)))
-            g.add((snippet, tss.pointType, Literal(pointType)))
-            g.add((snippet, tss.points, Literal(pointsJson)))
+            snippet_iri = row["snippet"]
+            template_bnode = row["template"]        # this is already a BlankNode
+            sensor = row["sensor"]
+            observedProperty = row["observedProperty"]
 
-            g.add((template, RDF.type, tss.PointTemplate))
-            g.add((template, SOSA.madeBySensor, sensor))
-            g.add((template, SOSA.observedProperty, observedProperty))
-        # Output path
-        year_str = f"{year:04d}"
-        month_str = f"{month:02d}"
-        day_str = f"{day:02d}"
+            # Named graph for this snippet
+            g_snip = ds.graph(snippet_iri)
 
-        file_path = os.path.join(base_path, year_str, month_str, day_str, "readings.trig")
+            # -----------------------------
+            # Add snippet triples
+            # -----------------------------
+            g_snip.add((snippet_iri, RDF.type, TSS.Snippet))
+            g_snip.add((snippet_iri, TSS.about, template_bnode))
+            g_snip.add((snippet_iri, TSS.from_, Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
+            g_snip.add((snippet_iri, TSS.to, Literal(row["toTime"].toPython(), datatype=XSD.dateTime)))
+            g_snip.add((snippet_iri, TSS.pointType, Literal(row["pointType"])))
+            g_snip.add((snippet_iri, TSS.points, Literal(row["pointsJson"])))
+
+            # -----------------------------
+            # Add PointTemplate into the SAME graph
+            # -----------------------------
+            g_snip.add((template_bnode, RDF.type, TSS.PointTemplate))
+            g_snip.add((template_bnode, SOSA.madeBySensor, sensor))
+            g_snip.add((template_bnode, SOSA.observedProperty, observedProperty))
+
+            # -----------------------------
+            # Add TSS member to metadat graph
+            # -----------------------------
+            metadata_graph.add((base_uri,TREE.member,snippet_iri))
+
+
+        # output path
+        file_path = os.path.join(
+            base_path,
+            f"{year:04d}", f"{month:02d}", f"{day:02d}",
+            "readings.trig"
+        )
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        # Write once → prefixes appear only once
-        g.serialize(destination=file_path, format="trig")
+        ds.serialize(destination=file_path, format="trig")
 
 
 

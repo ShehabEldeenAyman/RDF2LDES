@@ -1,4 +1,4 @@
-from rdflib import Graph, Namespace, Literal, URIRef, BNode,ConjunctiveGraph
+from rdflib import Graph, Namespace, Literal, URIRef, BNode,ConjunctiveGraph, Dataset
 from rdflib.namespace import XSD, RDF
 from collections import defaultdict
 from datetime import date, timedelta,timezone,datetime
@@ -166,19 +166,19 @@ def create_ldes_files():
             if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 3:#writing in each year file. so we should be refrencing months.
                 #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) 
                 #print(d) #this is the actual month.
-                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
-                temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime))) #this has a small bug that needs to be fixed
+                temp_graph.add((bn_ge,TREE.value,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_lt,TREE.value,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime))) #this has a small bug that needs to be fixed
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 2: #writing in the main data file. it should be ok
                 #print(d)
-                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(d),1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
-                temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(d)+1,1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_ge,TREE.value,Literal(datetime(int(d),1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_lt,TREE.value,Literal(datetime(int(d)+1,1,1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts) == 4:#writing in the month file. so we should be refrencing days.
                 #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) 
                 #print(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2])
-                temp_graph.add((bn_ge,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),int(d),0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
-                temp_graph.add((bn_lt,TREE.vaue,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),int(d),0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_ge,TREE.value,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),int(d),0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
+                temp_graph.add((bn_lt,TREE.value,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[1]),int(Path(os.path.join(root, f"{path.parts[0]}.ttl")).parts[2]),int(d),0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
 
             # if(len(Path(direct_subfolders).parts)==2):
             #     print(Path(direct_subfolders).parts[1]) #we should find a way to get the subfolders
@@ -213,26 +213,27 @@ def create_ldes_files():
         #print("-" * 40)
 
 def create_base_graph():
-    g = Graph()
-    g.bind("as", AS)
-    g.bind("ldes", LDES)
-    g.bind("tree", TREE)
-    g.bind("xsd", XSD)
+    g = Dataset()     # not Graph()
+    default = g.default_context
+
+    default.bind("as", AS)
+    default.bind("ldes", LDES)
+    default.bind("tree", TREE)
+    default.bind("xsd", XSD)
 
     retention_bn = BNode()
 
-    g.add((eventstream_uri, RDF.type, LDES.EventStream))
-    g.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
-    g.add((eventstream_uri, LDES.timestampPath, AS.published))
-    g.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
-    g.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
-    g.add((eventstream_uri, LDES.versionOfPath, AS.object))
-    #g.add((eventstream_uri, TREE.view, view_uri)) # this needs to be moved and properly fixed
+    default.add((eventstream_uri, RDF.type, LDES.EventStream))
+    default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
+    default.add((eventstream_uri, LDES.timestampPath, AS.published))
+    default.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
+    default.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
+    default.add((eventstream_uri, LDES.versionOfPath, AS.object))
 
-    g.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
-    g.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
+    default.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
+    default.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
 
-    return g
+    return g   # return the CG
 
 #def create_greaterthan_lessthan_relation(num):
     
