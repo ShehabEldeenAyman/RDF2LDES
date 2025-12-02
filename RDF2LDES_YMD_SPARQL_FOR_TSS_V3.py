@@ -76,7 +76,7 @@ def divide_data(result):
         #retention_policy = BNode()
 
         metadata_graph.add((eventstream_uri, RDF.type, LDES.EventStream))
-        metadata_graph.add((eventstream_uri, LDES.timestampPath, TSS._from))
+        metadata_graph.add((eventstream_uri, LDES.timestampPath, TSS["from"]))
         #metadata_graph.add((base_uri, LDES.versionCreateObject, AS.Create))
         #metadata_graph.add((base_uri, LDES.versionDeleteObject, AS.Delete))
         #metadata_graph.add((base_uri, LDES.versionOfPath, AS.object))
@@ -191,7 +191,7 @@ def create_ldes_files():
             if len(Path(os.path.join(root, f"{path.parts[-1]}.trig")).parts) > 3:
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_ge, TREE.path, TSS._from))
+            temp_graph.add((bn_ge, TREE.path, TSS["from"]))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.trig")).parts) == 3:#writing in each year file. so we should be refrencing months.
                 #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) 
@@ -223,7 +223,7 @@ def create_ldes_files():
                 #temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
                 temp_graph.add((bn_lt, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_lt, TREE.path, TSS._from))
+            temp_graph.add((bn_lt, TREE.path, TSS["from"]))
 
             #still missing the date time value here
 
@@ -258,7 +258,7 @@ def create_base_graph():
 
     default.add((eventstream_uri, RDF.type, LDES.EventStream))
     #default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
-    default.add((eventstream_uri, LDES.timestampPath, TSS._from))
+    default.add((eventstream_uri, LDES.timestampPath, TSS["from"]))
     #default.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
     #default.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
     #default.add((eventstream_uri, LDES.versionOfPath, AS.object))
