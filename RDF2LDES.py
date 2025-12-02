@@ -220,18 +220,19 @@ def create_base_graph():
     default.bind("ldes", LDES)
     default.bind("tree", TREE)
     default.bind("xsd", XSD)
+    
 
-    retention_bn = BNode()
+    #retention_bn = BNode()
 
     default.add((eventstream_uri, RDF.type, LDES.EventStream))
-    default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
-    default.add((eventstream_uri, LDES.timestampPath, AS.published))
+    #default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
+    default.add((eventstream_uri, LDES.timestampPath, ))
     default.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
     default.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
-    default.add((eventstream_uri, LDES.versionOfPath, AS.object))
+    #default.add((eventstream_uri, LDES.versionOfPath, AS.object))
 
-    default.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
-    default.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
+    #default.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
+    #default.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
 
     return g   # return the CG
 

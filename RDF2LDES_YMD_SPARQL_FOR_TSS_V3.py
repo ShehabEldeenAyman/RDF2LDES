@@ -73,19 +73,19 @@ def divide_data(result):
         metadata_graph = ds.graph()
         metadata_graph = ds.default_context
 
-        retention_policy = BNode()
+        #retention_policy = BNode()
 
-        metadata_graph.add((base_uri, RDF.type, LDES.EventStream))
-        metadata_graph.add((base_uri, LDES.timestampPath, AS.published))
-        metadata_graph.add((base_uri, LDES.versionCreateObject, AS.Create))
-        metadata_graph.add((base_uri, LDES.versionDeleteObject, AS.Delete))
-        metadata_graph.add((base_uri, LDES.versionOfPath, AS.object))
-        metadata_graph.add((base_uri, LDES.retentionPolicy, retention_policy))
+        metadata_graph.add((eventstream_uri, RDF.type, LDES.EventStream))
+        metadata_graph.add((base_uri, LDES.timestampPath, TSS._from))
+        #metadata_graph.add((base_uri, LDES.versionCreateObject, AS.Create))
+        #metadata_graph.add((base_uri, LDES.versionDeleteObject, AS.Delete))
+        #metadata_graph.add((base_uri, LDES.versionOfPath, AS.object))
+        #metadata_graph.add((base_uri, LDES.retentionPolicy, retention_policy))
 
-        metadata_graph.add((retention_policy, RDF.type, LDES.LatestVersionSubset))
-        metadata_graph.add((retention_policy, LDES.amount, Literal(1, datatype=XSD.integer)))
-        metadata_graph.add((base_uri, TREE.view, URIRef(f"{base_uri}{year:04d}/{month:02d}/{day:02d}/readings.trig")))
-
+        #metadata_graph.add((retention_policy, RDF.type, LDES.LatestVersionSubset))
+        #metadata_graph.add((retention_policy, LDES.amount, Literal(1, datatype=XSD.integer)))
+        #metadata_graph.add((base_uri, TREE.view, URIRef(f"{base_uri}{year:04d}/{month:02d}/{day:02d}/readings.trig")))
+        metadata_graph.add((base_uri, TREE.view, URIRef("")))
 
         for row in rows:
 
@@ -118,9 +118,9 @@ def divide_data(result):
             # Add TSS member to metadat graph
             # -----------------------------
             metadata_graph.add((base_uri,TREE.member,snippet_iri))
-            metadata_graph.add((snippet_iri,RDF.type, AS.Create))
-            metadata_graph.add((snippet_iri, AS.object, snippet_iri))
-            metadata_graph.add((snippet_iri, AS.published, Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
+            #metadata_graph.add((snippet_iri,RDF.type, AS.Create))
+            #metadata_graph.add((snippet_iri, AS.object, snippet_iri))
+            metadata_graph.add((snippet_iri, TSS._from, Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
 
 
 
@@ -141,7 +141,8 @@ directory = "LDESTSS/"
 AS = Namespace("https://www.w3.org/ns/activitystreams#")
 LDES = Namespace("https://w3id.org/ldes#")
 TREE = Namespace("https://w3id.org/tree#")
-eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDESTSS/LDESTSS.trig") #change this everytime you change the base uri for hosting
+TSS = Namespace("https://w3id.org/tss#")
+eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDESTSS/LDESTSS#eventstream") #change this everytime you change the base uri for hosting
 base_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/")
 
 def delete_ldes_files():
@@ -171,7 +172,8 @@ def create_ldes_files():
        
         for d in dirs:
             #print(" Subfolder:", d)                                                       
-            temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{base_uri}{root}/{path.parts[-1]}.trig"))) 
+            #temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{base_uri}{root}/{path.parts[-1]}.trig")))
+            temp_graph.add((eventstream_uri, TREE.view, URIRef("")))
             
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()
@@ -189,7 +191,7 @@ def create_ldes_files():
             if len(Path(os.path.join(root, f"{path.parts[-1]}.trig")).parts) > 3:
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_ge, TREE.path, AS.published))
+            temp_graph.add((bn_ge, TREE.path, TSS._from))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.trig")).parts) == 3:#writing in each year file. so we should be refrencing months.
                 #print(Path(os.path.join(root, f"{path.parts[0]}.ttl"))) 
@@ -221,7 +223,7 @@ def create_ldes_files():
                 #temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
                 temp_graph.add((bn_lt, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_lt, TREE.path, AS.published))
+            temp_graph.add((bn_lt, TREE.path, TSS._from))
 
             #still missing the date time value here
 
@@ -250,18 +252,19 @@ def create_base_graph():
     default.bind("ldes", LDES)
     default.bind("tree", TREE)
     default.bind("xsd", XSD)
+    default.bind("tss",TSS)
 
     retention_bn = BNode()
 
     default.add((eventstream_uri, RDF.type, LDES.EventStream))
-    default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
-    default.add((eventstream_uri, LDES.timestampPath, AS.published))
-    default.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
-    default.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
-    default.add((eventstream_uri, LDES.versionOfPath, AS.object))
+    #default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
+    default.add((eventstream_uri, LDES.timestampPath, TSS._from))
+    #default.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
+    #default.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
+    #default.add((eventstream_uri, LDES.versionOfPath, AS.object))
 
-    default.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
-    default.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
+    #default.add((retention_bn, RDF.type, LDES.LatestVersionSubset))
+    #default.add((retention_bn, LDES.amount, Literal(1, datatype=XSD.integer)))
 
     return g   # return the CG
 
