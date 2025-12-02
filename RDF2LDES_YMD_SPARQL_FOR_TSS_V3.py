@@ -76,7 +76,7 @@ def divide_data(result):
         #retention_policy = BNode()
 
         metadata_graph.add((eventstream_uri, RDF.type, LDES.EventStream))
-        metadata_graph.add((base_uri, LDES.timestampPath, TSS._from))
+        metadata_graph.add((eventstream_uri, LDES.timestampPath, TSS._from))
         #metadata_graph.add((base_uri, LDES.versionCreateObject, AS.Create))
         #metadata_graph.add((base_uri, LDES.versionDeleteObject, AS.Delete))
         #metadata_graph.add((base_uri, LDES.versionOfPath, AS.object))
