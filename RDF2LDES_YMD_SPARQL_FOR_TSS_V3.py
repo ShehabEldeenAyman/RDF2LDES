@@ -102,7 +102,7 @@ def divide_data(result):
             # -----------------------------
             g_snip.add((snippet_iri, RDF.type, TSS.Snippet))
             g_snip.add((snippet_iri, TSS.about, template_bnode))
-            g_snip.add((snippet_iri, TSS.from_, Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
+            g_snip.add((snippet_iri, TSS["from"], Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
             g_snip.add((snippet_iri, TSS.to, Literal(row["toTime"].toPython(), datatype=XSD.dateTime)))
             g_snip.add((snippet_iri, TSS.pointType, Literal(row["pointType"])))
             g_snip.add((snippet_iri, TSS.points, Literal(row["pointsJson"])))
@@ -120,7 +120,7 @@ def divide_data(result):
             metadata_graph.add((base_uri,TREE.member,snippet_iri))
             #metadata_graph.add((snippet_iri,RDF.type, AS.Create))
             #metadata_graph.add((snippet_iri, AS.object, snippet_iri))
-            metadata_graph.add((snippet_iri, TSS._from, Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
+            metadata_graph.add((snippet_iri, TSS["from"], Literal(row["fromTime"].toPython(), datatype=XSD.dateTime)))
 
 
 
