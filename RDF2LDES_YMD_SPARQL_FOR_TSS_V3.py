@@ -85,7 +85,7 @@ def divide_data(result):
         #metadata_graph.add((retention_policy, RDF.type, LDES.LatestVersionSubset))
         #metadata_graph.add((retention_policy, LDES.amount, Literal(1, datatype=XSD.integer)))
         #metadata_graph.add((base_uri, TREE.view, URIRef(f"{base_uri}{year:04d}/{month:02d}/{day:02d}/readings.trig")))
-        metadata_graph.add((eventstream_uri, TREE.view, URIRef("")))
+        metadata_graph.add((eventstream_uri, TREE.view, home_page))
 
         for row in rows:
 
@@ -144,6 +144,7 @@ TREE = Namespace("https://w3id.org/tree#")
 TSS = Namespace("https://w3id.org/tss#")
 eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDESTSS/LDESTSS#eventstream") #change this everytime you change the base uri for hosting
 base_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/")
+home_page = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDESTSS/LDESTSS.trig")
 
 def delete_ldes_files():
     for root, dirs, files in os.walk(directory):
@@ -173,7 +174,8 @@ def create_ldes_files():
         for d in dirs:
             #print(" Subfolder:", d)                                                       
             #temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{base_uri}{root}/{path.parts[-1]}.trig")))
-            temp_graph.add((eventstream_uri, TREE.view, URIRef("")))
+            #temp_graph.add((eventstream_uri, TREE.view, URIRef("")))
+            temp_graph.add((eventstream_uri, TREE.view,home_page ))
             
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()
