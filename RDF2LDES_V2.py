@@ -95,21 +95,35 @@ def divide_data(observations):
         file_path = os.path.join(base_path, f"{year}/{month:02d}/{day:02d}/readings.ttl")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        temp_graph = Graph()
-        temp_graph.bind("sosa", SOSA)
-        temp_graph.bind("ex", EX)
-        temp_graph.bind("xsd", XSD)
+        ds = Dataset()
+        ds.bind("sosa", SOSA)
+        ds.bind("ex", EX)
+        ds.bind("tss", TSS)
+        ds.bind("xsd", XSD)
+        ds.bind("ldes", LDES)
+        ds.bind("tree", TREE)
+        ds.bind("as", AS)
+        metadata_graph = ds.graph()
+        metadata_graph = ds.default_context
+
+        metadata_graph.add((eventstream_uri, RDF.type, LDES.EventStream))
+        metadata_graph.add((eventstream_uri, LDES.timestampPath, SOSA.resultTime))
+
+        metadata_graph.add((eventstream_uri, TREE.view, home_page))
         #store = ConjunctiveGraph()
 
         for obs, id_, result_value, property_, time_ in daily_obs:
-            temp_graph.add((obs, RDF.type, SOSA.Observation))
-            temp_graph.add((obs, EX.id, Literal(id_, datatype=XSD.int)))
-            temp_graph.add((obs, SOSA.hasSimpleResult, Literal(result_value, datatype=XSD.float)))
-            temp_graph.add((obs, SOSA.observedProperty, Literal(property_)))
-            temp_graph.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
+
+            g_snip = ds.graph(URIRef(f"{eventstream_uri}/{id_}"))
+
+            g_snip.add((obs, RDF.type, SOSA.Observation))
+            g_snip.add((obs, EX.id, Literal(id_, datatype=XSD.int)))
+            g_snip.add((obs, SOSA.hasSimpleResult, Literal(result_value, datatype=XSD.float)))
+            g_snip.add((obs, SOSA.observedProperty, Literal(property_)))
+            g_snip.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
 
 
-        temp_graph.serialize(destination=file_path, format="trig")
+        ds.serialize(destination=file_path, format="trig")
         #temp_graph.serialize(destination=file_path, format="turtle")
         # with open(file_path, "w", encoding="utf-8") as f:
         #     f.write(temp_graph.serialize(format="nt"))
@@ -173,7 +187,7 @@ def create_ldes_files():
             if len(Path(os.path.join(root, f"{path.parts[-1]}.trig")).parts) > 3:
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_ge, TREE.path, TSS["from"]))
+            temp_graph.add((bn_ge, TREE.path, SOSA.observedProperty))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.trig")).parts) == 3:#writing in each year file. so we should be refrencing months.
                 temp_graph.add((bn_ge,TREE.value,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.trig")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
@@ -204,7 +218,7 @@ def create_ldes_files():
                 #temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
                 temp_graph.add((bn_lt, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_lt, TREE.path, TSS["from"]))
+            temp_graph.add((bn_lt, TREE.path, SOSA.observedProperty))
 
             #still missing the date time value here
 
@@ -239,7 +253,7 @@ def create_base_graph():
 
     default.add((eventstream_uri, RDF.type, LDES.EventStream))
     #default.add((eventstream_uri, LDES.retentionPolicy, retention_bn))
-    default.add((eventstream_uri, LDES.timestampPath, TSS["from"]))
+    default.add((eventstream_uri, LDES.timestampPath,SOSA.resultTime))
     #default.add((eventstream_uri, LDES.versionCreateObject, AS.Create))
     #default.add((eventstream_uri, LDES.versionDeleteObject, AS.Delete))
     #default.add((eventstream_uri, LDES.versionOfPath, AS.object))
