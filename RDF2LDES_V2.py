@@ -92,7 +92,7 @@ def divide_data(observations):
         grouped[key].append((obs, id_, result_value, property_, time_))
 
     for (year, month, day), daily_obs in grouped.items():
-        file_path = os.path.join(base_path, f"{year}/{month:02d}/{day:02d}/readings.ttl")
+        file_path = os.path.join(base_path, f"{year}/{month:02d}/{day:02d}/readings.trig")
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         ds = Dataset()
