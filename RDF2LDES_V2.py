@@ -127,12 +127,12 @@ def divide_data(observations):
             g_snip.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
 
             if not ran_once:
-                time_temp_variable = time_
+                time_temp_variable = time_.replace(hour=0, minute=0, second=0, microsecond=0)
                 ran_once = True
 
 
 
-        metadata_graph.add((eventstream_uri,TSS["from"],Literal(time_temp_variable.date(), datatype=XSD.date)))
+        metadata_graph.add((eventstream_uri,TSS["from"],Literal(time_temp_variable, datatype=XSD.dateTime)))
   
 
         ds.serialize(destination=file_path, format="trig")
