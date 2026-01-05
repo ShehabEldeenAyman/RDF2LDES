@@ -112,9 +112,13 @@ def divide_data(observations):
         metadata_graph.add((eventstream_uri, TREE.view, home_page))
         #store = ConjunctiveGraph()
 
+        ran_once = False
         for obs, id_, result_value, property_, time_ in daily_obs:
 
             g_snip = ds.graph(URIRef(f"{eventstream_uri}/{id_}"))
+
+            metadata_graph.add((eventstream_uri,TREE.member,URIRef(f"{eventstream_uri}/{id_}")))
+
 
             g_snip.add((obs, RDF.type, SOSA.Observation))
             g_snip.add((obs, EX.id, Literal(id_, datatype=XSD.int)))
@@ -122,6 +126,14 @@ def divide_data(observations):
             g_snip.add((obs, SOSA.observedProperty, Literal(property_)))
             g_snip.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
 
+            if not ran_once:
+                time_temp_variable = time_
+                ran_once = True
+
+
+
+        metadata_graph.add((eventstream_uri,TSS["from"],Literal(time_temp_variable.date(), datatype=XSD.date)))
+  
 
         ds.serialize(destination=file_path, format="trig")
         #temp_graph.serialize(destination=file_path, format="turtle")
