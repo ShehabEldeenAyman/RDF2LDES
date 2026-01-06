@@ -109,15 +109,15 @@ def divide_data(observations):
         metadata_graph.add((eventstream_uri, RDF.type, LDES.EventStream))
         metadata_graph.add((eventstream_uri, LDES.timestampPath, SOSA.resultTime))
 
-        metadata_graph.add((eventstream_uri, TREE.view, home_page))
+        metadata_graph.add((eventstream_uri, TREE.view, URIRef(os.path.join(base_uri, f"LDES/{year}/{month:02d}/{day:02d}/readings.trig"))))
         #store = ConjunctiveGraph()
 
         ran_once = False
         for obs, id_, result_value, property_, time_ in daily_obs:
 
-            g_snip = ds.graph(URIRef(f"{eventstream_uri}/{id_}"))
+            g_snip = ds.graph(URIRef(f"{eventstream_uri}{id_}"))
 
-            metadata_graph.add((eventstream_uri,TREE.member,URIRef(f"{eventstream_uri}/{id_}")))
+            metadata_graph.add((eventstream_uri,TREE.member,URIRef(f"{eventstream_uri}{id_}")))
 
 
             g_snip.add((obs, RDF.type, SOSA.Observation))
@@ -146,7 +146,7 @@ AS = Namespace("https://www.w3.org/ns/activitystreams#")
 LDES = Namespace("https://w3id.org/ldes#")
 TREE = Namespace("https://w3id.org/tree#")
 TSS = Namespace("https://w3id.org/tss#")
-eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDES/LDES#eventstream") #change this everytime you change the base uri for hosting
+#eventstream_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDES/LDES#eventstream") #change this everytime you change the base uri for hosting
 base_uri = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/")
 home_page = URIRef("https://shehabeldeenayman.github.io/Mol_sluis_Dessel_Usecase/LDES/LDES.trig")
 
@@ -181,7 +181,7 @@ def create_ldes_files():
             #print(" Subfolder:", d)                                                       
             #temp_graph.add((eventstream_uri, TREE.view, URIRef(f"{base_uri}{root}/{path.parts[-1]}.trig")))
             #temp_graph.add((eventstream_uri, TREE.view, URIRef("")))
-            temp_graph.add((eventstream_uri, TREE.view,home_page ))
+            temp_graph.add((eventstream_uri, TREE.view,URIRef(f"{base_uri}{root}/{path.parts[-1]}.trig") ))
             
             write_log(f"Subfolder: {d} \n")
             bn_ge = BNode()
@@ -199,7 +199,7 @@ def create_ldes_files():
             if len(Path(os.path.join(root, f"{path.parts[-1]}.trig")).parts) > 3:
                 temp_graph.add((bn_ge, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_ge, TREE.path, SOSA.observedProperty))
+            temp_graph.add((bn_ge, TREE.path, SOSA.resultTime))
 
             if len(Path(os.path.join(root, f"{path.parts[0]}.trig")).parts) == 3:#writing in each year file. so we should be refrencing months.
                 temp_graph.add((bn_ge,TREE.value,Literal(datetime(int(Path(os.path.join(root, f"{path.parts[0]}.trig")).parts[1]),int(d),1,0,0,0, tzinfo=timezone.utc), datatype=XSD.dateTime)))
@@ -230,7 +230,7 @@ def create_ldes_files():
                 #temp_graph.add((bn_lt, TREE.node, URIRef(f"{eventstream_uri}{root}/{d}?page=0")))
                 temp_graph.add((bn_lt, TREE.node, URIRef(f"{base_uri}{root}/{d}/readings.trig")))
 
-            temp_graph.add((bn_lt, TREE.path, SOSA.observedProperty))
+            temp_graph.add((bn_lt, TREE.path, SOSA.resultTime))
 
             #still missing the date time value here
 
