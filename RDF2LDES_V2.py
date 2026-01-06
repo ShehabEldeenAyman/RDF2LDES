@@ -112,7 +112,7 @@ def divide_data(observations):
         metadata_graph.add((eventstream_uri, TREE.view, URIRef(os.path.join(base_uri, f"LDES/{year}/{month:02d}/{day:02d}/readings.trig"))))
         #store = ConjunctiveGraph()
 
-        ran_once = False
+        #ran_once = False
         for obs, id_, result_value, property_, time_ in daily_obs:
 
             g_snip = ds.graph(URIRef(f"{eventstream_uri}{id_}"))
@@ -126,13 +126,10 @@ def divide_data(observations):
             g_snip.add((obs, SOSA.observedProperty, Literal(property_)))
             g_snip.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
 
-            if not ran_once:
-                time_temp_variable = time_.replace(hour=0, minute=0, second=0, microsecond=0)
-                ran_once = True
-
-
-
-        metadata_graph.add((eventstream_uri,TSS["from"],Literal(time_temp_variable, datatype=XSD.dateTime)))
+            #if not ran_once:
+            time_temp_variable = time_.replace(hour=0, minute=0, second=0, microsecond=0)
+                #ran_once = True
+            metadata_graph.add((URIRef(f"{eventstream_uri}{id_}"),TSS["from"],Literal(time_temp_variable, datatype=XSD.dateTime)))
   
 
         ds.serialize(destination=file_path, format="trig")
