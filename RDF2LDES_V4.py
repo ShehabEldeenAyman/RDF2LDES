@@ -65,7 +65,7 @@ def extract_observations(g: Graph):
         result_node = g.value(obs, SOSA.hasSimpleResult)
         prop_node = g.value(obs, SOSA.observedProperty)
         time_node = g.value(obs, SOSA.resultTime)
-
+        runoff_node = g.value(obs, EX.runoffValue)
         # Validation: Check if any required nodes are missing
         if None in (result_node, prop_node, time_node):
             continue
@@ -85,8 +85,15 @@ def extract_observations(g: Graph):
                 time_val = datetime.fromisoformat(str(time_val).replace("Z", "+00:00"))
         except Exception:
             time_val = datetime.fromisoformat(str(time_node).replace("Z", "+00:00"))
+        
+        runoff_val = None
+        if runoff_node:
+            try:
+                runoff_val = float(runoff_node.toPython())
+            except Exception:
+                runoff_val = float(str(runoff_node))
 
-        observations.append((obs, id_val, result_val, prop_val, time_val))
+        observations.append((obs, id_val, result_val, prop_val, time_val,runoff_val))
 
     # Important for LDES: Sort by time to ensure data is written sequentially
     observations.sort(key=lambda t: t[4])
@@ -98,9 +105,9 @@ def divide_data(observations):
     grouped = defaultdict(list)
 
     # Group all observations by date
-    for obs, id_, result_value, property_, time_ in observations:
+    for obs, id_, result_value, property_, time_,runoff_val in observations:
         key = (time_.year, time_.month, time_.day)
-        grouped[key].append((obs, id_, result_value, property_, time_))
+        grouped[key].append((obs, id_, result_value, property_, time_,runoff_val))
 
     for (year, month, day), daily_obs in grouped.items():
         file_path = os.path.join(base_path, f"{year}/{month:02d}/{day:02d}/{day:02d}.trig")
@@ -124,7 +131,7 @@ def divide_data(observations):
         #store = ConjunctiveGraph()
 
         #ran_once = False
-        for obs, id_, result_value, property_, time_ in daily_obs:
+        for obs, id_, result_value, property_, time_,runoff_val in daily_obs:
 
             # CHANGED: Use the original Subject URI (obs) as the graph name
             # Old code: g_snip = ds.graph(URIRef(f"{eventstream_uri}{id_}"))
@@ -143,6 +150,9 @@ def divide_data(observations):
             g_snip.add((obs, SOSA.hasSimpleResult, Literal(result_value, datatype=XSD.float)))
             g_snip.add((obs, SOSA.observedProperty, Literal(property_)))
             g_snip.add((obs, SOSA.resultTime, Literal(time_, datatype=XSD.dateTime)))
+            
+            if runoff_val is not None:
+                g_snip.add((obs, EX.runoffValue, Literal(runoff_val, datatype=XSD.double)))
 
             #if not ran_once:
             time_temp_variable = time_.replace(hour=0, minute=0, second=0, microsecond=0)
